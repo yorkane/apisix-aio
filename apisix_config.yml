@@ -1,0 +1,92 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apisix:
+  node_listen: 9080              # APISIX listening port
+  enable_ipv6: false
+  enable_admin: true
+  proxy_mode: http&stream
+  stream_proxy: # TCP/UDP proxy
+    tcp: # TCP proxy address list
+      - addr: 9100
+        # tls: true
+    udp: # UDP proxy address list
+      - 9200
+      - "127.0.0.1:9200"
+deployment:
+  admin:
+    allow_admin:               # https://nginx.org/en/docs/http/ngx_http_access_module.html#allow
+      - 127.0.0.1              # We need to restrict ip access rules for security. 0.0.0.0/0 is for test.
+      - 192.168.1.15
+      - 192.168.5.15
+      - 192.168.1.31
+    admin_key:
+      - name: "admin"
+        key: ffffc9f034335f136f87ad84b625dddd
+        role: admin                 # admin: manage all configuration data
+
+  etcd:
+    host:                           # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
+      #- "http://192.168.1.31:2379"          # multiple etcd address
+      - "http://127.0.0.1:2379"          # multiple etcd address
+    prefix: "/apisix"               # apisix configurations prefix
+    timeout: 30                     # 30 seconds
+
+nginx_config:
+  http_configuration_snippet: |
+    gzip on;  #Development turn off
+    gzip_comp_level    6; # level 4-6 are the most efficiency settings
+    gzip_min_length  512;
+    gzip_buffers 16 64k;
+    proxy_temp_file_write_size 512k;
+    proxy_buffering on;
+    proxy_buffer_size    16k;
+    proxy_buffers           512 16k;
+    proxy_busy_buffers_size 64k;
+    client_body_temp_path /dev/shm/ngx_body_temp;
+    gzip_types      application/json application/x-javascript text/css application/javascript application/xml+rss text/javascript text/plain text/xml application/vnd.ms-fontobject application/x-font-opentype application/x-font-truetype application/x-font-ttf application/xml font/eot font/opentype font/otf image/vnd.microsoft.icon; #defualt contains text/html font/ttf font/otf image/svg+xml font/woff;
+    gzip_proxied any;
+    server
+     {
+        listen 60000;
+        server_name _;
+        access_log off;
+        gzip on;
+        location / {
+          root /html;
+        }
+    }
+    server
+    {
+        listen 60001;
+        server_name _;
+        access_log off;
+        location / {
+        rewrite_by_lua_block {
+          require('klib.mocks').mock()
+      }
+      }
+    }
+    chunked_transfer_encoding on;
+  stream_configuration_snippet: |
+    #server {
+    #    listen 19099;
+        #proxy_timeout 30s;
+        #proxy_pass 192.168.1.30:19099;
+    #    preread_by_lua_block {
+    #    }
+    #}
