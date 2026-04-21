@@ -16,7 +16,7 @@ RUN corepack enable && \
 FROM nginx:alpine
 
 # Copy built frontend assets
-COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
+COPY --from=builder /usr/src/app/dist /usr/share/nginx/html/ui
 
 # Copy custom nginx configuration to proxy /apisix/admin to APISIX
 COPY dashboard-nginx.conf /etc/nginx/conf.d/default.conf
