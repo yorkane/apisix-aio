@@ -17,7 +17,7 @@
 
 # Build Apache APISIX
 #FROM apache/apisix:latest
-FROM apache/apisix:3.11.0-debian
+FROM apache/apisix:3.16.0-debian
 
 ARG ENABLE_PROXY=false
 ARG ETCD_VERSION="v3.5.4"
@@ -52,7 +52,7 @@ CMD ["sh", "-c", "(nohup etcd >/tmp/etcd.log 2>&1 &) && sleep 3  && rm -f /usr/l
 STOPSIGNAL SIGQUIT
 
 
-# docker run -it --rm --user 0  apache/apisix:3.11.0-debian bash
+# docker run -it --rm --user 0  apache/apisix:3.16.0-debian bash
 # docker run -it --rm --user 0  yorkane/apisix-aio:latest bash
 # docker run -it --rm --user 0  yorkane/apisix-dashboard:latest  bash
 

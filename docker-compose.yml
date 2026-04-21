@@ -2,7 +2,7 @@ version: "3"
 
 services:
   apisix:
-    image: yorkane/apisix-aio
+    image: "ghcr.io/yorkane/apisix-aio:latest"
     restart: always
     container_name: apisix-aio
     volumes:
@@ -23,13 +23,9 @@ services:
     networks:
       apisix:
   dashboard:
-    image: "yorkane/apisix-dashboard:latest"
+    image: "ghcr.io/yorkane/apisix-dashboard:latest"
     container_name: apisix-dashboard
-    extra_hosts: 
-      - "etcd.d:host-gateway"
     restart: always
-    volumes:
-      - "./dashboard_conf.yml:/usr/local/apisix-dashboard/conf/conf.yaml:ro"
     ports:
       - "9000:9000/tcp"
     networks:
