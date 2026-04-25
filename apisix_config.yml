@@ -71,23 +71,17 @@ nginx_config:
         location / {
           root /html;
         }
-    }
-    server
-    {
-        listen 60001;
-        server_name _;
-        access_log off;
-        location / {
-        rewrite_by_lua_block {
-          require('klib.mocks').mock()
-      }
-      }
+        location /mock/ {
+          rewrite_by_lua_block {
+            require('klib.mocks').mock()
+          }
+        }
     }
     chunked_transfer_encoding on;
   stream_configuration_snippet: |
     server {
-        listen 60002;
-        proxy_pass 1.1.1.1:60002;
+        listen 60001;
+        proxy_pass 1.1.1.1:60001;
         # Keep long connection alive without interruption
         proxy_connect_timeout 1m;
         proxy_timeout 72h;

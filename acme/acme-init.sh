@@ -99,19 +99,44 @@ echo "$ACME_DOMAINS" | tr ';' '\n' | while IFS= read -r group; do
 
     # Check if certificate already exists
     if [ -f "$CERT_PATH" ]; then
-      echo "[acme-init] Certificate already exists for ${PRIMARY}, installing with deploy hook..."
-      "${ACME_HOME}/acme.sh" --home "$ACME_HOME" --config-home "$ACME_CONFIG" \
-        --install-cert ${DOMAIN_ARGS} \
-        --cert-file "${CERTS_DIR}/${PRIMARY}.cer" \
-        --key-file "${CERTS_DIR}/${PRIMARY}.key" \
-        --fullchain-file "${CERTS_DIR}/fullchain_${PRIMARY}.cer" \
-        --reloadcmd "${RELOAD_CMD}" \
-        || echo "[acme-init] install-cert failed for ${PRIMARY}, will retry on renewal"
+      # Check certificate age (seconds since creation)
+      CERT_AGE_DAYS=999
+      CERT_CONF="${ACME_CONFIG}/${PRIMARY}_ecc/${PRIMARY}.conf"
+      if [ -f "$CERT_CONF" ]; then
+        CREATE_TIME=$(grep "Le_CertCreateTime=" "$CERT_CONF" | cut -d= -f2 | tr -d "'")
+        if [ -n "$CREATE_TIME" ]; then
+          NOW=$(date +%s)
+          CERT_AGE_DAYS=$(( (NOW - CREATE_TIME) / 86400 ))
+        fi
+      fi
 
-      # Also run deploy now
-      echo "[acme-init] Running initial deploy for ${PRIMARY}..."
-      sh "$DEPLOY_SCRIPT" "$PRIMARY" "$CERT_PATH" "$KEY_PATH" "$FULLCHAIN_PATH" $ALL_DOMAINS \
-        || echo "[acme-init] Initial deploy failed for ${PRIMARY} (APISIX may not be ready yet)"
+      echo "[acme-init] Certificate exists for ${PRIMARY} (age: ${CERT_AGE_DAYS} days)"
+
+      if [ "$CERT_AGE_DAYS" -lt 60 ]; then
+        # Cert is fresh (< 60 days), just deploy directly to APISIX
+        echo "[acme-init] Certificate is still valid, deploying directly to APISIX..."
+        # Copy cert files to shared directory
+        cp "$CERT_PATH" "${CERTS_DIR}/${PRIMARY}.cer" 2>/dev/null || true
+        cp "$KEY_PATH" "${CERTS_DIR}/${PRIMARY}.key" 2>/dev/null || true
+        cp "$FULLCHAIN_PATH" "${CERTS_DIR}/fullchain_${PRIMARY}.cer" 2>/dev/null || true
+        chmod 644 "${CERTS_DIR}/${PRIMARY}.key" 2>/dev/null || true
+        # Deploy to APISIX
+        sh "$DEPLOY_SCRIPT" "$PRIMARY" "$CERT_PATH" "$KEY_PATH" "$FULLCHAIN_PATH" $ALL_DOMAINS \
+          || echo "[acme-init] Deploy failed for ${PRIMARY} (APISIX may not be ready yet)"
+      else
+        # Cert is old (>= 60 days), run install-cert to set up renewal hook
+        echo "[acme-init] Certificate is aging, running install-cert with renewal hook..."
+        "${ACME_HOME}/acme.sh" --home "$ACME_HOME" --config-home "$ACME_CONFIG" \
+          --install-cert ${DOMAIN_ARGS} \
+          --cert-file "${CERTS_DIR}/${PRIMARY}.cer" \
+          --key-file "${CERTS_DIR}/${PRIMARY}.key" \
+          --fullchain-file "${CERTS_DIR}/fullchain_${PRIMARY}.cer" \
+          --reloadcmd "${RELOAD_CMD}" \
+          || echo "[acme-init] install-cert failed for ${PRIMARY}, will retry on renewal"
+        # Deploy to APISIX
+        sh "$DEPLOY_SCRIPT" "$PRIMARY" "$CERT_PATH" "$KEY_PATH" "$FULLCHAIN_PATH" $ALL_DOMAINS \
+          || echo "[acme-init] Deploy failed for ${PRIMARY} (APISIX may not be ready yet)"
+      fi
     else
       echo "[acme-init] Issuing new certificate for ${PRIMARY}..."
       "${ACME_HOME}/acme.sh" --home "$ACME_HOME" --config-home "$ACME_CONFIG" \

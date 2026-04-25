@@ -18,10 +18,11 @@ services:
     ports:
       - "80:9080/tcp"
       - "443:9443/tcp"
-      # - "9180:9180/tcp" # admin api
+      - "9180:9180/tcp" # admin api
       # - "9091:9091/tcp" # metrics api
       # - "9092:9092/tcp" # metrics api
-      # - "9100:9100" #stream proxy 
+      - "9100:9100/tcp" #stream tcp proxy 
+      - "9200:9200/udp" #stream udp proxy 
       - "60000:60000" #local html serve
       # - "2379:2379/tcp"
     networks:
