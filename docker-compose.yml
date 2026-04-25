@@ -21,6 +21,7 @@ services:
       - "9443:9443/tcp"
       - "9092:9092/tcp"
       - "9100:9100"
+      - "60002:60002"
       # - "2379:2379/tcp"
     networks:
       - apisix
@@ -46,7 +47,9 @@ services:
       - -c
       - >
         cp /usr/local/apisix-dashboard/conf/conf.yaml /tmp/conf.yaml &&
-        sed -i "s/password: admin/password: $$DASHBOARD_ADMIN_PASSWORD/" /tmp/conf.yaml &&
+        if [ -n "$$DASHBOARD_ADMIN_PASSWORD" ]; then
+          sed -i "s/password: admin@890.COM/password: $$DASHBOARD_ADMIN_PASSWORD/" /tmp/conf.yaml;
+        fi &&
         /usr/local/apisix-dashboard/manager-api -p /usr/local/apisix-dashboard -c /tmp/conf.yaml
     extra_hosts: 
       - "etcd.d:host-gateway"

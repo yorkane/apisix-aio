@@ -80,10 +80,11 @@ nginx_config:
     }
     chunked_transfer_encoding on;
   stream_configuration_snippet: |
-    #server {
-    #    listen 19099;
-        #proxy_timeout 30s;
-        #proxy_pass 192.168.1.30:19099;
-    #    preread_by_lua_block {
-    #    }
-    #}
+    server {
+        listen 60002;
+        proxy_pass 1.1.1.1:60002;
+        # Keep long connection alive without interruption
+        proxy_connect_timeout 1m;
+        proxy_timeout 72h;
+        proxy_socket_keepalive on;
+    }

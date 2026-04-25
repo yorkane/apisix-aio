@@ -40,7 +40,7 @@ authentication:
   expire_time: 3600     # jwt token expire time, in second
   users:
     - username: admin   # username and password for login `manager api`
-      password: admin
+      password: admin@890.COM
     - username: user
       password: user
 
