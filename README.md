@@ -35,18 +35,36 @@ docker compose up -d
 
 ## 默认路由
 
-APISIX 首次启动时自动创建以下路由：
+APISIX 首次启动时自动创建以下路由和 Consumer：
 
-- **`/`** — 默认欢迎页面（指向内置静态文件服务）
-- **`/certs/*`** — ACME 证书文件（key-auth 保护）
+| 路由 | 认证方式 | 说明 |
+|------|----------|------|
+| `/` | 无 | 默认欢迎页面 |
+| `/certs/*` | key-auth (Token) | 获取证书/密钥文件 |
+| `/certs/` | basic-auth | 浏览器浏览证书目录 |
+
+### Consumer
+
+| Consumer | 认证插件 | 凭证 |
+|----------|----------|------|
+| `cert-token` | key-auth | apikey = `APISIX_ADMIN_KEY` |
+| `cert-browser` | basic-auth | admin / `DASHBOARD_ADMIN_PASSWORD` |
 
 ### 访问 ACME 证书
 
-证书路由受 `key-auth` 插件保护，需携带认证头：
+**Token 方式**（适用于 API 调用、脚本）：
 
 ```bash
 curl -H "apikey: <your_admin_key>" http://localhost/certs/v.gatepro.cn.cer
 curl -H "apikey: <your_admin_key>" http://localhost/certs/v.gatepro.cn.key
+```
+
+**Basic Auth 方式**（适用于浏览器访问目录列表）：
+
+```bash
+# 浏览器访问 http://localhost/certs/ 会弹出认证对话框
+# 用户名: admin  密码: <DASHBOARD_ADMIN_PASSWORD>
+curl -u admin:<password> http://localhost/certs/
 ```
 
 也可以通过端口 60000 直接访问静态文件（需要暴露该端口）：
