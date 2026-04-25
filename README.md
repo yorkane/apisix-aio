@@ -19,10 +19,28 @@ docker compose up -d
 |------|------|--------|
 | `APISIX_ADMIN_KEY` | APISIX Admin API 密钥 | `ffffc9f034335f136f87ad84b625dddd` |
 | `DASHBOARD_ADMIN_PASSWORD` | Dashboard 登录密码 | `admin@890.COM` |
+| `REDIS_PASSWORD` | Redis 密码（限流、缓存等插件） | `apisix_redis` |
 | `Ali_Key` | 阿里云 DNS API Key（ACME 证书） | - |
 | `Ali_Secret` | 阿里云 DNS API Secret（ACME 证书） | - |
 
 > **重要**：所有密钥都通过 `.env` 文件管理，容器启动时自动注入到配置文件中。
+
+### Redis 配置
+
+Redis 服务地址为 `apisix-redis:6379`，可在 APISIX 插件中使用：
+
+```json
+{
+  "limit-count": {
+    "count": 100,
+    "time_window": 60,
+    "policy": "redis",
+    "redis_host": "apisix-redis",
+    "redis_port": 6379,
+    "redis_password": "<REDIS_PASSWORD>"
+  }
+}
+```
 
 ## 服务端口
 
