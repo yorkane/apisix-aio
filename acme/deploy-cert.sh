@@ -53,6 +53,15 @@ KEY_CONTENT=$(awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' "$KEY_FILE")
 
 # --- Generate a stable SSL ID from the domain name ---
 SSL_ID=$(echo "$DOMAIN" | sed 's/[^a-zA-Z0-9]/-/g')
+# --- Wait for APISIX Admin API to be ready ---
+echo "[deploy-cert] Waiting for APISIX Admin API..."
+for i in $(seq 1 30); do
+  if curl -s -o /dev/null -w "%{http_code}" http://apisix:9180/apisix/admin/routes \
+    -H "X-API-KEY: ${ADMIN_KEY}" 2>/dev/null | grep -q "200"; then
+    break
+  fi
+  sleep 1
+done
 
 # --- Deploy to APISIX Admin API ---
 echo "[deploy-cert] Deploying SSL '${SSL_ID}' to APISIX with SNIs: ${snis_json}"
