@@ -24,8 +24,8 @@ conf:
       - "http://apisix-aio:2379"
 
                         # etcd basic auth info
-    # username: "root"    # ignore etcd username if not enable etcd auth
-    # password: "123456"  # ignore etcd password if not enable etcd auth
+    username: "admin"    # ignore etcd username if not enable etcd auth
+    password: "admin@890.COM"  # ignore etcd password if not enable etcd auth
   log:
     error_log:
       level: warn       # supports levels, lower to higher: debug, info, warn, error, panic, fatal

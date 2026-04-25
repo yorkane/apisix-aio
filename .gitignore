@@ -1,11 +1,12 @@
 # Compiled Lua sources
 luac.out
-
+/etcd/
 # luarocks build files
 *.src.rock
 *.zip
 *.tar.gz
-
+.env
+/acme/
 # Object files
 *.o
 *.os
