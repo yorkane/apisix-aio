@@ -12,6 +12,25 @@ fi
 
 # Start etcd in background
 nohup etcd >/tmp/etcd.log 2>&1 &
+
+# Start built-in Redis (skip if external Redis is configured)
+REDIS_PASS="${REDIS_PASSWORD:-apisix_redis}"
+if [ -z "${REDIS_EXTERNAL_HOST}" ]; then
+  echo "[entrypoint] Starting built-in Redis (127.0.0.1:6379, maxmemory 64mb)..."
+  nohup redis-server \
+    --bind 127.0.0.1 \
+    --port 6379 \
+    --requirepass "${REDIS_PASS}" \
+    --maxmemory 64mb \
+    --maxmemory-policy allkeys-lru \
+    --save "" \
+    --appendonly no \
+    --loglevel warning \
+    >/tmp/redis.log 2>&1 &
+else
+  echo "[entrypoint] External Redis configured (${REDIS_EXTERNAL_HOST}), skipping built-in Redis."
+fi
+
 sleep 3
 
 # Clean up stale sockets

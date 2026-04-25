@@ -19,15 +19,17 @@ docker compose up -d
 |------|------|--------|
 | `APISIX_ADMIN_KEY` | APISIX Admin API 密钥 | `ffffc9f034335f136f87ad84b625dddd` |
 | `DASHBOARD_ADMIN_PASSWORD` | Dashboard 登录密码 | `admin@890.COM` |
-| `REDIS_PASSWORD` | Redis 密码（限流、缓存等插件） | `apisix_redis` |
+| `REDIS_PASSWORD` | Redis 密码 | `apisix_redis` |
+| `REDIS_EXTERNAL_HOST` | 外部 Redis 地址（设置后跳过内置 Redis） | - |
+| `REDIS_EXTERNAL_PORT` | 外部 Redis 端口 | `6379` |
 | `Ali_Key` | 阿里云 DNS API Key（ACME 证书） | - |
 | `Ali_Secret` | 阿里云 DNS API Secret（ACME 证书） | - |
 
 > **重要**：所有密钥都通过 `.env` 文件管理，容器启动时自动注入到配置文件中。
 
-### Redis 配置
+### Redis
 
-Redis 服务地址为 `apisix-redis:6379`，可在 APISIX 插件中使用：
+AIO 容器内置 Redis（127.0.0.1:6379，最大内存 64MB），不对外暴露端口。APISIX 插件使用示例：
 
 ```json
 {
@@ -35,11 +37,18 @@ Redis 服务地址为 `apisix-redis:6379`，可在 APISIX 插件中使用：
     "count": 100,
     "time_window": 60,
     "policy": "redis",
-    "redis_host": "apisix-redis",
+    "redis_host": "127.0.0.1",
     "redis_port": 6379,
     "redis_password": "<REDIS_PASSWORD>"
   }
 }
+```
+
+如需使用外部 Redis，在 `.env` 中设置 `REDIS_EXTERNAL_HOST`，内置 Redis 将自动跳过启动：
+
+```bash
+REDIS_EXTERNAL_HOST=your-redis-host
+REDIS_EXTERNAL_PORT=6379
 ```
 
 ## 服务端口

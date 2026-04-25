@@ -33,7 +33,7 @@ COPY ./init-routes.sh /usr/local/apisix/init-routes.sh
 
 RUN echo https://github.com/etcd-io/etcd/releases/download/${ETCD_VERSION}/etcd-${ETCD_VERSION}-linux-amd64.tar.gz \
     && echo 'ls -lta "$@"' > /usr/bin/ll && chmod 755 /usr/bin/ll\
-    && apt update && apt install -y curl \
+    && apt update && apt install -y curl redis-server \
     && curl -sL https://github.com/etcd-io/etcd/releases/download/${ETCD_VERSION}/etcd-${ETCD_VERSION}-linux-amd64.tar.gz -o etcd.tar.gz \
     && tar -zxvf etcd.tar.gz \
     && mv etcd-*/* /usr/bin/ \

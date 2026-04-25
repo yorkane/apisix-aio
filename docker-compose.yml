@@ -65,23 +65,6 @@ services:
     networks:
       - apisix
 
-  redis:
-    image: redis:7-alpine
-    container_name: apisix-redis
-    restart: always
-    command: >
-      sh -c 'redis-server
-      --requirepass "$${REDIS_PASSWORD:-apisix_redis}"
-      --appendonly yes
-      --maxmemory 256mb
-      --maxmemory-policy allkeys-lru'
-    env_file:
-      - .env
-    volumes:
-      - "./redis:/data"
-    networks:
-      - apisix
-
 networks:
   apisix:
     driver: bridge
