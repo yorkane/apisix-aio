@@ -31,11 +31,3 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ghcr.io/yorkane/apisix-aio:latest
-
-      - name: Build and push apisix-dashboard image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile.dashboard
-          push: true
-          tags: ghcr.io/yorkane/apisix-dashboard:latest
