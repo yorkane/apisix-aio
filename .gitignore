@@ -6,7 +6,9 @@ luac.out
 *.zip
 *.tar.gz
 .env
-/acme/
+/acme/*
+!/acme/deploy-cert.sh
+!/acme/acme-init.sh
 # Object files
 *.o
 *.os
