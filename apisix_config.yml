@@ -63,6 +63,11 @@ nginx_config:
         server_name _;
         access_log off;
         gzip on;
+        location /certs/ {
+          root /html;
+          autoindex on;
+          default_type application/octet-stream;
+        }
         location / {
           root /html;
         }
