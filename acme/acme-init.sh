@@ -20,10 +20,16 @@ ACME_CONFIG="/acme.sh"
 CERTS_DIR="${ACME_CONFIG}/certs"
 DEPLOY_SCRIPT="${ACME_CONFIG}/deploy-cert.sh"
 DNS_PROVIDER="${ACME_DNS_PROVIDER:-dns_ali}"
+ACME_CA="${ACME_CA_SERVER:-letsencrypt}"
 
 # Ensure certs directory exists
 mkdir -p "$CERTS_DIR"
 chmod +x "$DEPLOY_SCRIPT" 2>/dev/null || true
+
+# Set default CA server (avoid ZeroSSL registration requirement in clean environments)
+echo "[acme-init] Setting default CA to: ${ACME_CA}"
+"${ACME_HOME}/acme.sh" --home "$ACME_HOME" --config-home "$ACME_CONFIG" \
+  --set-default-ca --server "$ACME_CA" 2>/dev/null || true
 
 if [ -z "$ACME_DOMAINS" ]; then
   echo "[acme-init] ACME_DOMAINS not set, skipping certificate issuance."
