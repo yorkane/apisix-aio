@@ -31,6 +31,17 @@ echo "[acme-init] Setting default CA to: ${ACME_CA}"
 "${ACME_HOME}/acme.sh" --home "$ACME_HOME" --config-home "$ACME_CONFIG" \
   --set-default-ca --server "$ACME_CA" 2>/dev/null || true
 
+# Register account with email if provided (speeds up first-time issuance)
+if [ -n "${ACME_EMAIL}" ]; then
+  if ! grep -q "ACCOUNT_EMAIL" "${ACME_CONFIG}/account.conf" 2>/dev/null; then
+    echo "[acme-init] Registering account with email: ${ACME_EMAIL}"
+    "${ACME_HOME}/acme.sh" --home "$ACME_HOME" --config-home "$ACME_CONFIG" \
+      --register-account -m "${ACME_EMAIL}" 2>/dev/null || true
+  else
+    echo "[acme-init] Account already registered."
+  fi
+fi
+
 if [ -z "$ACME_DOMAINS" ]; then
   echo "[acme-init] ACME_DOMAINS not set, skipping certificate issuance."
   echo "[acme-init] Starting acme.sh daemon for existing certificate renewals..."

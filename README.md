@@ -20,7 +20,9 @@ docker compose up -d
 | `APISIX_ADMIN_KEY` | APISIX Admin API 密钥 | `ffffc9f034335f136f87ad84b625dddd` |
 | `DASHBOARD_ADMIN_PASSWORD` | Dashboard 登录密码 | `admin@890.COM` |
 | `ACME_DOMAINS` | ACME 证书域名（见下方说明） | - |
+| `ACME_EMAIL` | ACME 账户邮箱（预注册加速 + 到期提醒） | - |
 | `ACME_DNS_PROVIDER` | DNS 验证提供商 | `dns_ali` |
+| `ACME_CA_SERVER` | CA 服务器 | `letsencrypt` |
 | `Ali_Key` | 阿里云 DNS API Key | - |
 | `Ali_Secret` | 阿里云 DNS API Secret | - |
 | `REDIS_PASSWORD` | Redis 密码 | `apisix_redis` |
