@@ -30,9 +30,12 @@ services:
   acme:
     image: neilpang/acme.sh:latest
     container_name: acme-sh
-    command: daemon
+    entrypoint: /bin/sh
+    command: /acme.sh/acme-init.sh
     env_file:
       - .env
+    depends_on:
+      - apisix
     volumes:
       - "./acme:/acme.sh"
     networks:

@@ -19,13 +19,30 @@ docker compose up -d
 |------|------|--------|
 | `APISIX_ADMIN_KEY` | APISIX Admin API 密钥 | `ffffc9f034335f136f87ad84b625dddd` |
 | `DASHBOARD_ADMIN_PASSWORD` | Dashboard 登录密码 | `admin@890.COM` |
+| `ACME_DOMAINS` | ACME 证书域名（见下方说明） | - |
+| `ACME_DNS_PROVIDER` | DNS 验证提供商 | `dns_ali` |
+| `Ali_Key` | 阿里云 DNS API Key | - |
+| `Ali_Secret` | 阿里云 DNS API Secret | - |
 | `REDIS_PASSWORD` | Redis 密码 | `apisix_redis` |
 | `REDIS_EXTERNAL_HOST` | 外部 Redis 地址（设置后跳过内置 Redis） | - |
-| `REDIS_EXTERNAL_PORT` | 外部 Redis 端口 | `6379` |
-| `Ali_Key` | 阿里云 DNS API Key（ACME 证书） | - |
-| `Ali_Secret` | 阿里云 DNS API Secret（ACME 证书） | - |
 
 > **重要**：所有密钥都通过 `.env` 文件管理，容器启动时自动注入到配置文件中。
+
+### ACME 证书自动管理
+
+通过 `ACME_DOMAINS` 环境变量配置需要签发的域名。ACME 容器启动时自动签发证书，并通过 `deploy-cert.sh` 部署到 APISIX。证书续期时自动重新部署。
+
+**域名格式**：
+- 逗号分隔同一证书的域名
+- 分号分隔不同证书组
+
+```bash
+# 单证书覆盖所有域名
+ACME_DOMAINS=c.gatepro.cn,*.c.gatepro.cn,v.gatepro.cn,*.v.gatepro.cn
+
+# 两个独立证书
+ACME_DOMAINS=c.gatepro.cn,*.c.gatepro.cn; v.gatepro.cn,*.v.gatepro.cn
+```
 
 ### Redis
 
