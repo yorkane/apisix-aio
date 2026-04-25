@@ -21,7 +21,7 @@ conf:
     port: 9000          # `manager api` listening port
   etcd:
     endpoints:          # supports defining multiple etcd host addresses for an etcd cluster
-      - "http://apisix-aio:2379"
+      - "http://apisix:2379"
 
                         # etcd basic auth info
     username: "admin"    # ignore etcd username if not enable etcd auth

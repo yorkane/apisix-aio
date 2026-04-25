@@ -27,6 +27,8 @@ WORKDIR /tmp
 LABEL etcd_version="${ETCD_VERSION}"
 USER root
 COPY ./klib/ /usr/local/apisix/klib
+COPY ./entrypoint.sh /usr/local/apisix/entrypoint.sh
+COPY ./init-routes.sh /usr/local/apisix/init-routes.sh
 # https://github.com/etcd-io/etcd/releases/download/v3.5.17/etcd-v3.5.17-linux-amd64.tar.gz
 
 RUN echo https://github.com/etcd-io/etcd/releases/download/${ETCD_VERSION}/etcd-${ETCD_VERSION}-linux-amd64.tar.gz \
@@ -37,6 +39,7 @@ RUN echo https://github.com/etcd-io/etcd/releases/download/${ETCD_VERSION}/etcd-
     && mv etcd-*/* /usr/bin/ \
     && rm -rf etcd* \
     && rm -rf /usr/local/openresty/openssl3/share/ /usr/local/openresty/openssl3/include/ /usr/local/openresty/pod/ \
+    && chmod +x /usr/local/apisix/entrypoint.sh /usr/local/apisix/init-routes.sh \
     && chown apisix:apisix -R /usr/local/apisix/ \
     && echo Finished
 
@@ -47,7 +50,7 @@ ENV PATH=$PATH:/usr/local/openresty/luajit/bin:/usr/local/openresty/nginx/sbin:/
 
 EXPOSE 9180 9080 9443 2379 2380
 
-CMD ["sh", "-c", "(nohup etcd >/tmp/etcd.log 2>&1 &) && sleep 3  && rm -f /usr/local/apisix/logs/stream_worker_events.sock /usr/local/apisix/logs/worker_events.sock && /usr/bin/apisix init && /usr/bin/apisix init_etcd && /usr/local/openresty/bin/openresty -p /usr/local/apisix -g 'daemon off;'"]
+CMD ["/usr/local/apisix/entrypoint.sh"]
 
 STOPSIGNAL SIGQUIT
 

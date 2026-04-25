@@ -4,24 +4,25 @@ services:
   apisix:
     image: "ghcr.io/yorkane/apisix-aio:latest"
     restart: always
-    container_name: apisix-aio
+    container_name: apisix
     volumes:
-      - "./apisix_config.yml:/usr/local/apisix/conf/config.yaml:ro"
+      - "./apisix_config.yml:/usr/local/apisix/conf/config.yaml.tpl:ro"
       - "./etcd/:/usr/local/apisix/default.etcd/"
+      - "./acme/certs:/html/certs:ro"
+    env_file:
+      - .env
     environment:
       - APISIX_STAND_ALONE=false
-      - ETCD_ADVERTISE_CLIENT_URLS=http://apisix-aio:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://apisix:2379
       - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
     ports:
       - "80:9080/tcp"
       - "443:9443/tcp"
-      - "9180:9180/tcp"
-      - "9080:9080/tcp"
-      - "9091:9091/tcp"
-      - "9443:9443/tcp"
-      - "9092:9092/tcp"
-      - "9100:9100"
-      - "60002:60002"
+      # - "9180:9180/tcp" # admin api
+      # - "9091:9091/tcp" # metrics api
+      # - "9092:9092/tcp" # metrics api
+      # - "9100:9100" #stream proxy 
+      - "60000:60000" #local html serve
       # - "2379:2379/tcp"
     networks:
       - apisix
@@ -49,6 +50,9 @@ services:
         cp /usr/local/apisix-dashboard/conf/conf.yaml /tmp/conf.yaml &&
         if [ -n "$$DASHBOARD_ADMIN_PASSWORD" ]; then
           sed -i "s/password: admin@890.COM/password: $$DASHBOARD_ADMIN_PASSWORD/" /tmp/conf.yaml;
+        fi &&
+        if [ -n "$$APISIX_ADMIN_KEY" ]; then
+          sed -i "s/ffffc9f034335f136f87ad84b625dddd/$$APISIX_ADMIN_KEY/g" /tmp/conf.yaml;
         fi &&
         /usr/local/apisix-dashboard/manager-api -p /usr/local/apisix-dashboard -c /tmp/conf.yaml
     extra_hosts: 
