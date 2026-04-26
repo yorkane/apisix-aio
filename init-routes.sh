@@ -105,6 +105,49 @@ put_route() {
   fi
 }
 
+# Check if a stream route exists. Returns 0 if exists, 1 if not.
+stream_route_exists() {
+  local route_id="$1"
+  local code
+  code=$(curl -s -o /dev/null -w "%{http_code}" \
+    "${ADMIN_API}/stream_routes/${route_id}" \
+    -H "X-API-KEY: ${ADMIN_KEY}" 2>/dev/null)
+  [ "$code" = "200" ]
+}
+
+# PUT (upsert) a stream route. In normal mode, skips if route already exists.
+# Usage: put_stream_route <route_id> <json_body>
+put_stream_route() {
+  local route_id="$1"
+  local json="$2"
+
+  if [ "$FORCE_MODE" = "false" ] && stream_route_exists "$route_id"; then
+    log "Stream Route '${route_id}' already exists, skipping. (use --force to update)"
+    return 0
+  fi
+
+  local action="Creating"
+  stream_route_exists "$route_id" && action="Updating"
+
+  log "${action} stream route '${route_id}'..."
+  local result
+  result=$(curl -s -w "\n%{http_code}" \
+    "${ADMIN_API}/stream_routes/${route_id}" \
+    -H "X-API-KEY: ${ADMIN_KEY}" \
+    -H "Content-Type: application/json" \
+    -X PUT -d "$json" 2>/dev/null)
+
+  local http_code
+  http_code=$(echo "$result" | tail -1)
+  if [ "$http_code" = "200" ] || [ "$http_code" = "201" ]; then
+    log "Stream Route '${route_id}' OK (HTTP ${http_code})"
+  else
+    local body
+    body=$(echo "$result" | sed '$d')
+    log "WARNING: Stream Route '${route_id}' returned HTTP ${http_code}: ${body}"
+  fi
+}
+
 # PUT (upsert) a consumer. Always upserts (consumers are idempotent).
 # Usage: put_consumer <json_body>
 put_consumer() {
