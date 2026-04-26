@@ -10,6 +10,7 @@
 put_route "acme-certs" '{
   "uri": "/certs/*",
   "name": "acme-cert-files",
+  "status": 1,
   "desc": "Access ACME certificate files via token (key-auth)",
   "plugins": {
     "key-auth": {}
@@ -24,6 +25,7 @@ put_route "acme-certs" '{
 put_route "acme-certs-dir" '{
   "uri": "/certs/",
   "name": "acme-cert-directory",
+  "status": 1,
   "desc": "Browse ACME certificate directory via basic-auth (browser)",
   "plugins": {
     "basic-auth": {}

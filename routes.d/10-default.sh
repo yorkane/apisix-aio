@@ -7,6 +7,7 @@
 put_route "default" '{
   "uri": "/",
   "name": "default-welcome",
+  "status": 1,
   "desc": "Default welcome route - returns APISIX welcome page",
   "upstream": {
     "type": "roundrobin",

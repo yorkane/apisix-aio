@@ -93,6 +93,11 @@ put_route() {
   http_code=$(echo "$result" | tail -1)
   if [ "$http_code" = "200" ] || [ "$http_code" = "201" ]; then
     log "Route '${route_id}' OK (HTTP ${http_code})"
+    # PATCH status=1 to ensure route is published (PUT ignores status field)
+    curl -s -o /dev/null "${ADMIN_API}/routes/${route_id}" \
+      -H "X-API-KEY: ${ADMIN_KEY}" \
+      -H "Content-Type: application/json" \
+      -X PATCH -d '{"status": 1}' 2>/dev/null
   else
     local body
     body=$(echo "$result" | sed '$d')

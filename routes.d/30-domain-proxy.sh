@@ -27,6 +27,7 @@ log "  Admin API:  ${ADMIN_API_HOST}"
 put_route "dashboard-proxy" "{
   \"uri\": \"/*\",
   \"name\": \"dashboard-proxy\",
+  \"status\": 1,
   \"desc\": \"Proxy APISIX Dashboard via domain ${DASHBOARD_HOST}\",
   \"host\": \"${DASHBOARD_HOST}\",
   \"plugins\": {
@@ -44,6 +45,7 @@ put_route "dashboard-proxy" "{
 put_route "admin-api-proxy" "{
   \"uri\": \"/*\",
   \"name\": \"admin-api-proxy\",
+  \"status\": 1,
   \"desc\": \"Proxy APISIX Admin API via domain ${ADMIN_API_HOST}\",
   \"host\": \"${ADMIN_API_HOST}\",
   \"plugins\": {
