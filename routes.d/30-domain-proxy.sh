@@ -40,14 +40,21 @@ put_route "dashboard-proxy" "{
   }
 }"
 
-# Admin API proxy (protected by basic-auth)
+# Admin API proxy (protected by basic-auth, auto-injects X-API-KEY)
 put_route "admin-api-proxy" "{
   \"uri\": \"/*\",
   \"name\": \"admin-api-proxy\",
   \"desc\": \"Proxy APISIX Admin API via domain ${ADMIN_API_HOST}\",
   \"host\": \"${ADMIN_API_HOST}\",
   \"plugins\": {
-    \"basic-auth\": {}
+    \"basic-auth\": {},
+    \"proxy-rewrite\": {
+      \"headers\": {
+        \"set\": {
+          \"X-API-KEY\": \"${ADMIN_KEY}\"
+        }
+      }
+    }
   },
   \"upstream\": {
     \"type\": \"roundrobin\",
