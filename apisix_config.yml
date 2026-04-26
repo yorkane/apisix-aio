@@ -24,6 +24,15 @@ apisix:
     tcp: # TCP proxy address list
       - addr: 9100
         # tls: true
+      - 60001
+      - 60002
+      - 60003
+      - 60004
+      - 60005
+      - 60006
+      - 60007
+      - 60008
+      - 60009
     udp: # UDP proxy address list
       - 9200
       - "127.0.0.1:9200"
@@ -78,12 +87,5 @@ nginx_config:
         }
     }
     chunked_transfer_encoding on;
-  stream_configuration_snippet: |
-    server {
-        listen 60001;
-        proxy_pass 1.1.1.1:60001;
-        # Keep long connection alive without interruption
-        proxy_connect_timeout 1m;
-        proxy_timeout 72h;
-        proxy_socket_keepalive on;
-    }
+  # stream_configuration_snippet: use Admin API stream routes for dynamic TCP proxying
+  # Ports 60001-60009 are available via stream_proxy.tcp above

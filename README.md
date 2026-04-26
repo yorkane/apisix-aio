@@ -97,9 +97,29 @@ REDIS_EXTERNAL_PORT=6379
 | 443 | APISIX HTTPS 代理 | 必需 |
 | 9000 | APISIX Dashboard | 设置 `APISIX_ROOT_DOMAIN` 后可移除 |
 | 9180 | APISIX Admin API | 设置 `APISIX_ROOT_DOMAIN` 后可移除 |
+| 9100 | Stream TCP 代理 | 固定 stream 端口 |
 | 60000 | 内置静态文件服务 | 内部使用 |
+| 60001-60009 | 动态 Stream TCP 代理 | 通过 Admin API 管理 stream 路由 |
 
 > **提示**：配置 `APISIX_ROOT_DOMAIN` 后，Dashboard 和 Admin API 通过域名路由访问，无需暴露 9000/9180 端口。
+
+### 动态 Stream TCP 路由
+
+端口 60001-60009 可通过 Admin API 动态创建 stream 路由，无需修改配置文件或重启：
+
+```bash
+# 创建一个 stream 路由：将本机 60001 端口的 TCP 流量转发到 remote-host:3306
+curl http://127.0.0.1:9180/apisix/admin/stream_routes/mysql-proxy \
+  -H "X-API-KEY: <APISIX_ADMIN_KEY>" \
+  -H "Content-Type: application/json" \
+  -X PUT -d '{
+    "server_port": 60001,
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": { "remote-host:3306": 1 }
+    }
+  }'
+```
 
 ## 默认路由
 

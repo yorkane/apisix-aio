@@ -24,7 +24,8 @@ services:
       # - "9092:9092/tcp" # metrics api
       - "9100:9100/tcp" #stream tcp proxy 
       - "9200:9200/udp" #stream udp proxy 
-      - "60000:60000" #local html serve
+      - "60000:60000"   #local html serve
+      - "60001-60009:60001-60009/tcp" #dynamic stream tcp proxy
       # - "2379:2379/tcp"
     networks:
       - apisix
