@@ -12,6 +12,7 @@ USER root
 COPY ./klib/ /usr/local/apisix/klib
 COPY ./entrypoint.sh /usr/local/apisix/entrypoint.sh
 COPY ./init-routes.sh /usr/local/apisix/init-routes.sh
+COPY ./routes.d/ /usr/local/apisix/routes.d/
 # https://github.com/etcd-io/etcd/releases/download/v3.5.17/etcd-v3.5.17-linux-amd64.tar.gz
 
 RUN echo https://github.com/etcd-io/etcd/releases/download/${ETCD_VERSION}/etcd-${ETCD_VERSION}-linux-amd64.tar.gz \
@@ -22,7 +23,7 @@ RUN echo https://github.com/etcd-io/etcd/releases/download/${ETCD_VERSION}/etcd-
     && mv etcd-*/* /usr/bin/ \
     && rm -rf etcd* \
     && rm -rf /usr/local/openresty/openssl3/share/ /usr/local/openresty/openssl3/include/ /usr/local/openresty/pod/ \
-    && chmod +x /usr/local/apisix/entrypoint.sh /usr/local/apisix/init-routes.sh \
+    && chmod +x /usr/local/apisix/entrypoint.sh /usr/local/apisix/init-routes.sh /usr/local/apisix/routes.d/*.sh \
     && chown apisix:apisix -R /usr/local/apisix/ \
     && echo Finished
 

@@ -9,6 +9,7 @@ services:
       - "./apisix_config.yml:/usr/local/apisix/conf/config.yaml.tpl:ro"
       - "./etcd/:/usr/local/apisix/default.etcd/"
       - "./acme/certs:/html/certs:ro"
+      - "./html:/html"
     env_file:
       - .env
     environment:
@@ -18,7 +19,7 @@ services:
     ports:
       - "80:9080/tcp"
       - "443:9443/tcp"
-      - "9180:9180/tcp" # admin api
+      # - "9180:9180/tcp" # admin api (enable this if APISIX_ROOT_DOMAIN is not set)
       # - "9091:9091/tcp" # metrics api
       # - "9092:9092/tcp" # metrics api
       - "9100:9100/tcp" #stream tcp proxy 
@@ -65,7 +66,7 @@ services:
     volumes:
       - "./dashboard_conf.yml:/usr/local/apisix-dashboard/conf/conf.yaml:ro"
     ports:
-      - "9000:9000/tcp"
+      - "9000:9000/tcp" # dashboard (enable this if APISIX_ROOT_DOMAIN is not set)
     networks:
       - apisix
 

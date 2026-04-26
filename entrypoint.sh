@@ -40,8 +40,8 @@ rm -f /usr/local/apisix/logs/stream_worker_events.sock /usr/local/apisix/logs/wo
 /usr/bin/apisix init
 /usr/bin/apisix init_etcd
 
-# Initialize default routes in background
-/usr/local/apisix/init-routes.sh &
+# Initialize default routes in background (force mode to sync with current env)
+/usr/local/apisix/init-routes.sh --force &
 
 # Run openresty in foreground
 exec /usr/local/openresty/bin/openresty -p /usr/local/apisix -g 'daemon off;'
